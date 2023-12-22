@@ -3,17 +3,14 @@ const inquirer = require("inquirer");
 const { Triangle, Square, Circle } = require("./lib/shapes.js");
 
 function generateSVG(data) {
-  const oppeningTag =
+  const openingTag =
     '<svg version="1.1" width="300" height="200" xmlns="http://www.w3.org/2000/svg">';
-  const shapeTag = "teeest";
+  const shapeTag = data.shape.render();
+  const txtTag = `<text font-weight="bold" x="150" y="100" font-size="60" text-anchor="middle" fill="${data.textColor}">${data.text}</text>`;
 
   const closingTag = "</svg>";
-  const finalSVG = oppeningTag + shapeTag + closingTag;
+  const finalSVG = openingTag + shapeTag + txtTag + closingTag;
   return finalSVG;
-  // const shapeTag = ""
-  // if, else if, else to assign the shapeTag
-  // const finalSVG = oppeningTag + ShapeTag
-  // return final SVG
 }
 
 function form() {
@@ -48,7 +45,22 @@ function form() {
         console.log("Your logo text must be no larger than three characters!");
         form();
       } else {
-        const template = generateSVG(data);
+        let shapeInstance;
+        if (data.shape === "Circle") {
+          shapeInstance = new Circle();
+        } else if (data.shape === "Square") {
+          shapeInstance = new Square();
+        } else if (data.shape === "Triangle") {
+          shapeInstance = new Triangle();
+        }
+
+        shapeInstance.setColor(data.shapeColor);
+
+        const template = generateSVG({
+          shape: shapeInstance,
+          textColor: data.textColor,
+          text: data.text,
+        });
         fs.writeFile("logo.svg", template, function (err) {
           err ? console.log("ERROR!") : console.log("Generated logo.svg");
         });
